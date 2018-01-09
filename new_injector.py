@@ -14,7 +14,7 @@ class Injector:
         self.path = path
 
     def response(self, flow: http.HTTPFlow) -> None:
-        
+
         flow.response.headers.pop('Strict-Transport-Security', None)
         flow.response.headers.pop('Public-Key-Pins', None)
 
